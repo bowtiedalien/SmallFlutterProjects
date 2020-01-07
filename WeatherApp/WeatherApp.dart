@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
         body: Center(
           child: Column(
             children: <Widget>[
-              updateTempWidget('Adana'),
+              updateTempWidget('Bursa'), //if it's a multi-word city, pass the argument with plus sign (eg: 'new+york')
             ],
           ),
         ),
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
 //the function that gets info from the api
 Future<Map> getWeather(String appId, String city) async
 {
-  String apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$appId&units=metric'; //the api call that has all the info we need
+  String apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=$appId&units=metric'; //the api call that has all the info we need
   http.Response response = await http.get(apiUrl); //perform HTTP GET method (gets data from api), and store the response in a variable
   return jsonDecode(response.body); //return the body of the response as a map object
 }
@@ -73,7 +73,7 @@ Widget updateTempWidget(String city)
                       'rain presence: ' + content['weather'][0]['main'],
                       style: TempStyle(),
                     ),
-                    trailing: Icon(Icons.cloud),
+                    trailing: ChooseIcon(content['weather'][0]['main']),
                   ),
                   ListTile(
                     title: Text(
@@ -91,8 +91,11 @@ Widget updateTempWidget(String city)
               ),
           );
         }
+         else if(snapshot.hasError){
+          return ErrorWidget("Check your internet connection");
+        }
         else
-          return Container(); //without this line, errors arise. Must provide else block for if statement
+          return CircularProgressIndicator(); //without this line, errors arise. Must provide else block for if statement
       }
   );
 }
@@ -105,4 +108,29 @@ Widget WeatherIcon(String weather){
     {
       return Image.asset('mist.png'); //usage example
     }
+}
+
+
+class NewScreen extends StatefulWidget {
+  @override
+  _NewScreenState createState() => _NewScreenState();
+}
+
+class _NewScreenState extends State<NewScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+
+Widget ChooseIcon(String weather){
+  if(weather.toLowerCase() == 'rain') {
+    return Icon(Icons.grain);
+  }
+  else if(weather.toLowerCase() == 'clouds')
+    return Icon(Icons.grain);
+  else if(weather.toLowerCase() == 'snow')
+    return Icon(Icons.ac_unit);
+  else
+    return Icon(Icons.wb_sunny);
 }
